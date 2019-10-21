@@ -19,15 +19,13 @@ import {jsonLiteral} from '../../../../src/json';
 const PARSELY_CONFIG = jsonLiteral({
   'vars': {
     'data': '{}',
-    'plid': Math.floor(Math.random() * 99999999),
-    'pvid': Math.floor(Math.random() * 99999999),
   },
   'requests': {
     'host': 'https://srv.pixel.parsely.com',
     'basePrefix':
       '${host}/plogger/?' +
       'rand=${timestamp}&' +
-      'plid=${plid}&' +
+      'plid=${pageViewId}&' +
       'idsite=${apikey}&' +
       'url=${ampdocUrl}&' +
       'urlref=${documentReferrer}&' +
@@ -38,7 +36,7 @@ const PARSELY_CONFIG = jsonLiteral({
       'title=${title}&' +
       'date=${timestamp}&' +
       'ampid=${clientId(_parsely_visitor)}&' +
-      'pvid=${pvid}',
+      'pvid=${pageViewId}',
     'pageview':
       '${basePrefix}&action=pageview&metadata=' +
       '{"canonical_url":"${canonicalUrl}"}',
