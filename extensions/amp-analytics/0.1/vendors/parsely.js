@@ -25,7 +25,6 @@ const PARSELY_CONFIG = jsonLiteral({
     'basePrefix':
       '${host}/plogger/?' +
       'rand=${timestamp}&' +
-      'plid=${pageViewId}&' +
       'idsite=${apikey}&' +
       'url=${ampdocUrl}&' +
       'urlref=${documentReferrer}&' +
@@ -35,8 +34,7 @@ const PARSELY_CONFIG = jsonLiteral({
       'data=${data}&' +
       'title=${title}&' +
       'date=${timestamp}&' +
-      'ampid=${clientId(_parsely_visitor)}&' +
-      'pvid=${pageViewId}',
+      'ampid=${clientId(_parsely_visitor)}&',
     'pageview':
       '${basePrefix}&action=pageview&metadata=' +
       '{"canonical_url":"${canonicalUrl}"}',
