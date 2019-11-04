@@ -106,7 +106,8 @@ function isPatched(win) {
  * @param {!Error} error
  */
 function rethrowAsync(error) {
-  new /*OK*/ Promise(() => {
+  setTimeout(() => {
+    self.__AMP_REPORT_ERROR(error);
     throw error;
   });
 }
@@ -228,11 +229,6 @@ class Registry {
     this.win_ = win;
 
     /**
-     * @private @const
-     */
-    this.doc_ = win.document;
-
-    /**
      * @type {!Object<string, !CustomElementDef>}
      * @private
      * @const
@@ -260,12 +256,11 @@ class Registry {
     this.mutationObserver_ = null;
 
     /**
-     * All the observed DOM trees, including shadow trees. This is cleared out
-     * when the mutation observer is created.
+     * All the observed DOM trees, including shadow trees.
      *
      * @private @const {!Array<!Node>}
      */
-    this.observed_ = [win.document];
+    this.roots_ = [win.document];
   }
 
   /**
@@ -346,7 +341,9 @@ class Registry {
     };
 
     this.observe_(name);
-    this.upgrade(this.doc_, name);
+    this.roots_.forEach(tree => {
+      this.upgrade(tree, name);
+    });
   }
 
   /**
@@ -510,10 +507,12 @@ class Registry {
     });
     this.mutationObserver_ = mo;
 
-    this.observed_.forEach(tree => {
+    // I would love to not have to hold onto all of the roots, since it's a
+    // memory leak. Unfortunately, there's no way to iterate a list and hold
+    // onto its contents weakly.
+    this.roots_.forEach(tree => {
       mo.observe(tree, TRACK_SUBTREE);
     });
-    this.observed_.length = 0;
 
     installPatches(this.win_, this);
   }
@@ -524,10 +523,9 @@ class Registry {
    * @param {!Node} tree
    */
   observe(tree) {
+    this.roots_.push(tree);
     if (this.mutationObserver_) {
       this.mutationObserver_.observe(tree, TRACK_SUBTREE);
-    } else {
-      this.observed_.push(tree);
     }
   }
 
@@ -795,6 +793,16 @@ function polyfill(win) {
 
   // Expose the polyfilled HTMLElement constructor for everyone to extend from.
   win.HTMLElement = HTMLElementPolyfill;
+
+  // When we transpile `super` in Custom Element subclasses, we change it to
+  // `superClass.call(this)` (where `superClass` is `HTMLElementPolyfill`).
+  // That `.call` value is inherited from `Function.prototype`.
+  // But, IE11's native HTMLElement hierarchy doesn't extend from Function!
+  // And because `HTMLElementPolyfill` extends from `HTMLElement`, it doesn't
+  // have a `.call`! So we need to manually install it.
+  if (!HTMLElementPolyfill.call) {
+    HTMLElementPolyfill.call = win.Function.call;
+  }
 }
 
 /**
