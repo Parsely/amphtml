@@ -34,7 +34,7 @@ const PARSELY_CONFIG = jsonLiteral({
       'data=${data}&' +
       'title=${title}&' +
       'date=${timestamp}&' +
-      'ampid=${clientId(_parsely_visitor)}&',
+      'ampid=${clientId(_parsely_visitor)}',
     'pageview':
       '${basePrefix}&action=pageview&metadata=' +
       '{"canonical_url":"${canonicalUrl}"}',
