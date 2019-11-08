@@ -17,6 +17,9 @@
 import {jsonLiteral} from '../../../../src/json';
 
 const PARSELY_CONFIG = jsonLiteral({
+  'vars': {
+    'data': '{}',
+  },
   'requests': {
     'host': 'https://srv.pixel.parsely.com',
     'basePrefix':
@@ -28,6 +31,7 @@ const PARSELY_CONFIG = jsonLiteral({
       'screen=${screenWidth}x${screenHeight}%7C' +
       '${availableScreenWidth}x${availableScreenHeight}%7C' +
       '${screenColorDepth}&' +
+      'data=${data}&' +
       'title=${title}&' +
       'date=${timestamp}&' +
       'ampid=${clientId(_parsely_visitor)}',
